@@ -37,6 +37,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    totalIncome: {
+      type: Number,
+      default: 0,
+    },
+    profit: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

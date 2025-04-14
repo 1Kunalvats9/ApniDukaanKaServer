@@ -7,6 +7,7 @@ import uploadRoutes from "./routes/upload.js";
 import inventoryRoutes from "./routes/inventory.js";
 import smsRoutes from "./routes/sms.js";
 import checkoutRoutes from "./routes/checkout.js";
+import userRoutes from "./routes/user.js"
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use("/api/sms", smsRoutes);
 app.use("/api/checkout", checkoutRoutes);
+app.use('/api/user',userRoutes)
 
 app.get('/', (req, res) => {
   res.send('API is running...');
