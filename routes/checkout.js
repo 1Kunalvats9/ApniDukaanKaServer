@@ -24,9 +24,14 @@ router.post('/checkout-product', async (req, res) => {
     for (const cartItem of cart) {
       const { name, price, wholesalePrice, quantity: qty, id } = cartItem;
 
-      totalPrice += price*quantity;
+      const itemTotalPrice = price * qty;
+      totalPrice += itemTotalPrice;
       totalProfit += (price - wholesalePrice) * qty;
 
+      console.log(`Product: ${name}, Quantity: ${qty}, Unit Price: ${price}, Subtotal: ${itemTotalPrice}`);
+      console.log(`Current Total Price: ${totalPrice}`);
+
+      
       const inventory = await Inventory.findOne({ email });
       if (!inventory) {
         return res.status(404).json({ message: `Inventory not found for email: ${email}` });
