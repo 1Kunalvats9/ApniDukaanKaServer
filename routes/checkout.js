@@ -24,7 +24,7 @@ router.post('/checkout-product', async (req, res) => {
     for (const cartItem of cart) {
       const { name, price, wholesalePrice, quantity: qty, id } = cartItem;
 
-      totalPrice += price;
+      totalPrice += price*quantity;
       totalProfit += (price - wholesalePrice) * qty;
 
       const inventory = await Inventory.findOne({ email });
