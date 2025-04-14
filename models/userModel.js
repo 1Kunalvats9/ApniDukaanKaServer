@@ -1,5 +1,18 @@
 import mongoose from 'mongoose';
 
+const checkoutItemSchema = new mongoose.Schema({
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  name: String,
+  quantity: Number,
+  price: Number, 
+});
+
+const checkoutSchema = new mongoose.Schema({
+  orderedProducts: [checkoutItemSchema],
+  totalPrice: { type: Number, required: true },
+  dateOfCheckout: { type: Date, default: Date.now },
+});
+
 const userSchema = new mongoose.Schema(
   {
     shopName: {
@@ -45,6 +58,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    checkoutHistory: [checkoutSchema],
   },
   { timestamps: true }
 );

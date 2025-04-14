@@ -1,21 +1,73 @@
 import express from 'express';
-import Inventory from "../models/inventoryModel.js"
+import User from '../models/User.js';
+import Inventory from '../models/Inventory.js';
+
 const router = express.Router();
 
 router.post('/checkout-product', async (req, res) => {
   try {
-    const { cart } = req.body;
+    const { cart, email } = req.body;
 
-    for (const item of cart) {
-      await Inventory.updateOne(
-        { 'products._id': item.id },
-        { $inc: { 'products.$.quantity': -item.quantity } }
-      );
+    if (!cart || !Array.isArray(cart) || cart.length === 0 || !email) {
+      return res.status(400).json({ message: 'Invalid request data.' });
     }
 
-    res.status(200).json({ success: true, message: "Product updated successfully" });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    let totalPrice = 0;
+    let totalProfit = 0;
+    const orderedProducts = [];
+
+    for (const cartItem of cart) {
+      const { name, price, wholesalePrice, quantity: qty, id } = cartItem;
+
+      totalPrice += price;
+      totalProfit += (price - wholesalePrice) * qty;
+
+      const inventory = await Inventory.findOne({ email });
+      if (!inventory) {
+        return res.status(404).json({ message: `Inventory not found for email: ${email}` });
+      }
+
+      const productInInventory = inventory.products.find(p => p.id === id);
+
+      if (!productInInventory) {
+        return res.status(404).json({ message: `Product with ID ${id} not found in inventory.` });
+      }
+
+      if (productInInventory.quantity < qty) {
+        return res.status(400).json({ message: `Insufficient quantity for product: ${name}` });
+      }
+
+      productInInventory.quantity -= qty;
+      await inventory.save();
+
+      orderedProducts.push({
+        productId: id, // Assuming 'id' in cart item corresponds to product ID in Inventory
+        name,
+        quantity: qty,
+        price,
+      });
+    }
+
+    const newCheckout = {
+      orderedProducts,
+      totalPrice,
+    };
+
+    user.totalIncome += totalPrice;
+    user.profit += totalProfit;
+    user.checkoutHistory.push(newCheckout);
+    await user.save();
+
+    res.status(200).json({ message: 'Checkout successful. Inventory updated, user income and profit updated.' });
+
+  } catch (error) {
+    console.error('Error during checkout:', error);
+    res.status(500).json({ message: 'An error occurred during checkout.' });
   }
 });
 
