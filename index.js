@@ -22,6 +22,11 @@ app.use('/api/inventory', inventoryRoutes);
 app.use("/api/sms", smsRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use('/api/user',userRoutes)
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 app.get('/', (req, res) => {
   res.send('API is running...');
