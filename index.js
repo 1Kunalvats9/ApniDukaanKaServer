@@ -29,7 +29,11 @@ app.get('/', (req, res) => {
 
 const startServer = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI,{
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      // other options if needed, like connectTimeoutMS, serverSelectionTimeoutMS
+    });
     console.log('MongoDB connected ✅');
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);

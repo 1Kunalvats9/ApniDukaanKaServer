@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import User from "../models/userModel";
+import User from "../models/userModel.js";
 
 const router = express.Router();
 
@@ -24,3 +24,5 @@ router.post('/get-user', async (req,res)=>{
         res.status(500).json({ success: false, message: err.message });
     }
 })
+
+export default router
